@@ -1,16 +1,19 @@
 from flask import Flask, request, jsonify
 import pandas as pd
 import pickle
+import os
 from prophet.serialize import model_from_json
 from flask_cors import CORS 
+
 app = Flask(__name__)
-CORS(app) 
+CORS(app)  # Enable CORS
+
 # Load models
-with open("models/event_models.pkl", "rb") as f:
+model_path = os.path.join(os.path.dirname(__file__), "models/event_models.pkl")
+with open(model_path, "rb") as f:
     models = pickle.load(f)
 
 @app.route('/predict', methods=['GET'])
- 
 def predict():
     event_type = request.args.get('event', default="Weddings")
     year = int(request.args.get('year', default=2025))
@@ -37,4 +40,5 @@ def predict():
     return jsonify({"event": event_type, "year": year, "month": month, "prediction": round(final_prediction)})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Use the Render-assigned port
+    app.run(host="0.0.0.0", port=port, debug=True)
