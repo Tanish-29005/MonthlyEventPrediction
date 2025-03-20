@@ -7,7 +7,9 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
-
+@app.route('/')
+def home():
+    return jsonify({"message": "API is running successfully!"}), 200
 # Load models
 model_path = os.path.join(os.path.dirname(__file__), "models/event_models.pkl")
 with open(model_path, "rb") as f:
